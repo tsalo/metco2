@@ -118,7 +118,7 @@ def rrf(tr=2.0):
     return rrf
 
 
-def rvt(physio_f, samplerate=40, tr=2.0):
+def rvt(physio_f, samplerate=40, tr=2.0, start_tr=0, end_tr=None):
     """
     Calculates the respiratory-volume-per-time (RVT)
      from a raw pneumatic belt time series.
@@ -143,4 +143,8 @@ def rvt(physio_f, samplerate=40, tr=2.0):
     datafile = physio_f
     resp = peakdet.RESP(datafile, samplerate)
     resp.get_peaks(thresh=0.2)
-    return resp.RVT(start=8.0, end=438.0, TR=tr)
+    if end_tr is None:
+        temp = np.loadtxt(datafile)
+        sr_sec = 1 / samplerate
+        end_tr = int((temp.shape[0] * sr_sec) / tr)
+    return resp.RVT(start=start_tr*tr, end=(end_tr*tr)-tr, TR=tr)
